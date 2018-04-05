@@ -24,9 +24,9 @@
   <div>
     Gender: <input type="text" ng-model="gender" >
   </div>
-  <div>
+  <div ng-controller="nameCtrl">
     <b>Details:</b><br>     
-    <tt> Full Name: {{ fname + lname}}</tt><br/>
+    <tt> Full Name: {{ getName(fname,lname)}}</tt><br/>
     <tt> Gender: {{ gender }}</tt><br/>
     <tt>dob = {{ dob | date: "yyyy-MM-dd"}}</tt><br/>
     <tt>age = {{ getAge(dob)}}</tt><br/>
@@ -37,16 +37,43 @@
 <script>
 var app = angular.module('eitApp', []);
 
+
 app.controller('ageCtrl', function($scope) {
   $scope.getAge = function(dob){
     var dob = new Date(dob);
     var today = new Date();
-    var age = ((today - dob) / (31557600000));
-    var age = Math.floor( age );
-    return age;
+    var diff = Math.floor(today.getTime() - dob.getTime());
+    var day = 1000 * 60 * 60 * 24;
+
+    var days = Math.floor(diff/day);
+    var months = Math.floor(days/31);
+    var years = Math.floor(months/12);
+    
+    var response = "You are " + years + " years, " + months + " months, and " + days + " days old ";
+
+    return response;
   }
 });
+
+
+// app.controller('ageCtrl', function($scope) {
+//   $scope.getAge = function(dob){
+//     var dob = new Date(dob);
+//     var today = new Date();
+//     var age = ((today - dob) / (31557600000));
+//     var age = Math.floor( age );
+//     return age;
+//   }
+// });
   
+app.controller('nameCtrl', function($scope) {
+  $scope.getName = function(fname="", lname=""){
+    var fName = fname + " " + lname
+    return fName;
+  }
+});
+
+
 </script>
   
 </html>
