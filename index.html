@@ -1,81 +1,116 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
-  <title>Example - example-guide-concepts-1-production</title>
-  
+  <title>EIT | Angular</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+  <script src="res/service.js"></script>
+  <script src="res/index.js"></script>
 
-  <script src="/bower_components/angular/angular.js"></script>
-  
-  
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="res/bootstrap.min.css">
+
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.9/css/all.css" integrity="sha384-5SOiIsAziJl6AWe0HWRKTXlfcSHKmYV4RBF18PPJ173Kzn7jzMyFuTtk8JA7QQG1"
+    crossorigin="anonymous">
+
+
 </head>
-<body >
-  <div ng-init="fname;lname;dob;gender;age" ng-app="eitApp" ng-controller="ageCtrl">
-  <b>EIT Info</b>
-  <div>
-    Firstname: <input type="text" ng-model="fname">
-  </div>
-  <div>
-    Lastname: <input type="text" ng-model="lname">
-  </div>
-  <div>
-    Date of birth: <input type="date" ng-model="dob" placeholder="yyyy-MM-dd" default=1111-1-11>
-  </div>
-  <div>
-    Gender: <input type="text" ng-model="gender" >
-  </div>
-  <div ng-controller="nameCtrl">
-    <b>Details:</b><br>     
-    <tt> Full Name: {{ getName(fname,lname)}}</tt><br/>
-    <tt> Gender: {{ gender }}</tt><br/>
-    <tt>dob = {{ dob | date: "yyyy-MM-dd"}}</tt><br/>
-    <tt>age = {{ getAge(dob)}}</tt><br/>
-  </div>
+
+<body>
+  <div class="container-fluid" ng-app="index">
+    <div class="row">
+      <section class="col-sm" id="crud-add" ng-controller="AddController as add_eit">
+        
+        <form>
+          <div ng-if="!add_eit.getEditState()">
+            <div class="form-group">
+              <label>First Name:</label>
+              <input ng-model="add_eit.firstname" class="form-control">
+            </div>
+            <div class="form-group">
+              <label>Last Name:</label>
+              <input ng-model="add_eit.lastname" class="form-control">
+            </div>
+            <div class="form-group">
+              <label>DOB:</label>
+              <input type="date" ng-model="add_eit.dob" class="form-control">
+            </div>
+            <div class="form-group">
+              <label>Gender</label>
+              <select class="form-control" ng-model="add_eit.gender">
+                <option>Female</option>
+                <option>Male</option>
+              </select>
+            </div>
+          </div>
+          <div ng-if="add_eit.getEditState()">
+            <div class="form-group">
+              <label>First Name:</label>
+              <input class="form-control" ng-value="add_eit.getActiveEitEdit().firstname" ng-model="add_eit.firstname">
+            </div>
+            <div class="form-group">
+              <label>Last Name:</label>
+              <input class="form-control" ng-value="add_eit.getActiveEitEdit().lastname" ng-model="add_eit.lastname">
+            </div>
+            <div class="form-group">
+              <label>DOB:</label>
+              <input type="date" class="form-control" ng-value="add_eit.getActiveEitEdit().dob" ng-model="add_eit.dob">
+            </div>
+            <div class="form-group">
+              <label>Gender</label>
+              <select class="form-control" ng-model="add_eit.gender">
+                <option ng-selected="add_eit.getActiveEitEdit().gender == 'Female'">Female</option>
+                <option ng-selected="add_eit.getActiveEitEdit().gender == 'Male'">Male</option>
+              </select>
+            </div>
+          </div>
+          <a href ng-click="add_eit.addEit(add_eit.firstname,add_eit.lastname,add_eit.dob,add_eit.gender)">Add EIT</a>
+          <a href ng-click="add_eit.updateEit(add_eit.firstname,add_eit.lastname,add_eit.dob,add_eit.gender)">Update Info</a>
+        </form>
+      </section>
+      <section class="col-sm" id="crud-view" ng-controller="ViewController as view_eit">
+        <div ng-if="view_eit.getActiveEit()">
+          <div class="card">
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item">Name: {{view_eit.getActiveEit().firstname +" "+ view_eit.getActiveEit().lastname}}</li>
+              <li class="list-group-item">DOB: {{view_eit.getActiveEit().dob|date}}</li>
+              <li class="list-group-item">Gender: {{view_eit.getActiveEit().gender}}</li>
+              <li class="list-group-item">Age: {{ view_eit.getAge(view_eit.getActiveEit())}}</li>
+              <li class="list-group-item">Full Age: {{ view_eit.getFullAge(view_eit.getActiveEit())}}</li>
+            </ul>
+          </div>
+        </div>         
+      </section>
+      <section class="col-sm" ng-controller="ListController as list_eit">
+        <table ng-if="list_eit.getEitList().length > 0" class="table table-stripped">
+          <thead>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Actions</th>
+          </thead>
+          <tbody>
+            <tr ng-repeat="item in list_eit.getEitList() track by item.id">
+              <td>{{item.firstname}}</td>
+              <td>{{item.lastname}}</td>
+              <td>
+                <span ng-click="list_eit.removeEit(item.id)" style="padding: 0px 5px;">
+                  <i class="fa fa-trash"></i>
+                </span>
+                <span ng-click="list_eit.viewEit(item.id)" style="padding: 0px 5px;" data-toggle="modal" data-target="#exampleModal">
+                  <i class="fa fa-eye"></i>
+                </span>
+                <span ng-click="list_eit.editEit(item.id)" style="padding: 0px 5px;">
+                  <i class="fa fa-edit"></i>
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </div>
   </div>
 </body>
-
-<script>
-var app = angular.module('eitApp', []);
-
-
-app.controller('ageCtrl', function($scope) {
-  $scope.getAge = function(dob){
-    var dob = new Date(dob);
-    var today = new Date();
-    var diff = Math.floor(today.getTime() - dob.getTime());
-    var day = 1000 * 60 * 60 * 24;
-
-    var days = Math.floor(diff/day);
-    var months = Math.floor(days/31);
-    var years = Math.floor(months/12);
-    
-    var response = "You are " + years + " years, " + months + " months, and " + days + " days old ";
-
-    return response;
-  }
-});
-
-
-// app.controller('ageCtrl', function($scope) {
-//   $scope.getAge = function(dob){
-//     var dob = new Date(dob);
-//     var today = new Date();
-//     var age = ((today - dob) / (31557600000));
-//     var age = Math.floor( age );
-//     return age;
-//   }
-// });
-  
-app.controller('nameCtrl', function($scope) {
-  $scope.getName = function(fname="", lname=""){
-    var fName = fname + " " + lname
-    return fName;
-  }
-});
-
-
-</script>
-  
 </html>
 
 <!-- 
